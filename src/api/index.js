@@ -10,7 +10,7 @@ instance.interceptors.request.use(
     // const { getToken } = useAuthStore();
     // const token = getToken();
     const token =
-      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYW1waW5rNDMyMkBuYXZlci5jb20iLCJpYXQiOjE3NTM0MzI3NDYsImV4cCI6MTc1MzQzMzA0Nn0.RcpwXSFK2DY4ERU85OltnBTXhmUc4mMnz9vqsg4XT9k';
+      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYW1waW5rNDMyMkBuYXZlci5jb20iLCJpYXQiOjE3NTM0NDE3MDAsImV4cCI6MTc1MzQ0MjAwMH0.C0rTbtyGBPwovGljNjVxXkia3dbnoHHUWzcQYZxHPf8';
     //실제 로그인 토큰 값으로 변경
     //현재 프론트 로그인 미구현으로 임시 이용
 

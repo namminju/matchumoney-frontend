@@ -11,7 +11,7 @@
     <div class="product-card__body" @click="onClick">
       <div class="product-card__logo-box">
         <img
-          :src="saving.company_logo_url"
+          src="../../assets/bank-Logos/BK_HANA_Profile.png"
           alt="logo"
           class="product-card__logo"
         />
@@ -21,19 +21,25 @@
       <div class="product-card__info">
         <div class="product-card__row">
           <span>최고 금리</span>
-          <span class="product-card__highlight">{{ saving.max_rate }}</span>
+          <span class="product-card__highlight"
+            >{{ roundToTwoDecimalPlaces(saving.max_rate) }}%</span
+          >
         </div>
         <div class="product-card__row">
           <span>기본 금리</span>
-          <span>{{ saving.base_rate }}</span>
+          <span>{{ roundToTwoDecimalPlaces(saving.base_rate) }}%</span>
         </div>
         <div class="product-card__row">
           <span>금액</span>
-          <span>{{ saving.amount }}</span>
+          <span v-if="saving.amount"
+            >매달 {{ Number(saving.amount).toLocaleString('ko-KR') }}원
+            이하</span
+          >
+          <span v-else>제한 조건 없음</span>
         </div>
         <div class="product-card__row">
           <span>개월 수</span>
-          <span>{{ saving.period }}</span>
+          <span>{{ saving.period }}개월</span>
         </div>
       </div>
     </div>
@@ -44,6 +50,7 @@
 import { defineProps } from 'vue';
 import FavoriteToggle from '@/components/common/FavoriteToggle.vue';
 import CompareButton from '@/components/common/CompareButton.vue';
+import { roundToTwoDecimalPlaces } from '@/util/numberFormatter';
 const props = defineProps({
   saving: {
     type: Object,
@@ -103,7 +110,7 @@ const onClick = () => {
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-xs);
-  width: 28%;
+  width: 24%;
   height: 100%;
   text-align: center;
 }

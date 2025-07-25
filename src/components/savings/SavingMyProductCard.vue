@@ -1,4 +1,6 @@
 <script setup>
+import { formatDateString } from '@/util/dateFormatter';
+import { roundToTwoDecimalPlaces } from '@/util/numberFormatter';
 defineProps({
   saving: {
     type: Object,
@@ -23,16 +25,16 @@ defineProps({
         <div class="date-section">
           <div class="info-row">
             <div class="label">신규일</div>
-            <div class="value">{{ saving.start_date }}</div>
+            <div class="value">{{ formatDateString(saving.start_date) }}</div>
           </div>
           <div class="info-row">
             <div class="label">만기일</div>
-            <div class="value">{{ saving.end_date }}</div>
+            <div class="value">{{ formatDateString(saving.end_date) }}</div>
           </div>
         </div>
         <div class="rate-section">
           <div class="label">금리</div>
-          <div class="rate">{{ saving.rate }}</div>
+          <div class="rate">{{ roundToTwoDecimalPlaces(saving.rate) }}%</div>
         </div>
       </div>
     </div>

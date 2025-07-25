@@ -16,6 +16,8 @@ import PersonaCardAllList from '@/pages/persona/PersonaCardAllList.vue';
 import PersonaDepositAllList from '@/pages/persona/PersonaDepositAllListPage.vue';
 import PersonaSavingAllList from '@/pages/persona/PersonaSavingAllListPage.vue';
 
+import RecommendSavings from '@/pages/savings/recommendations/RecommendSavings.vue';
+
 /* 결과 페이지 (동적 import) */
 const ResultPage = () => import('@/pages/persona/PersonaResultPage.vue');
 
