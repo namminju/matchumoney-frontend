@@ -22,7 +22,7 @@
         v-if="saving.companyImage"
       />
       <img
-        src="../../assets/Logo_dis.png"
+        src="../../assets/logo_dis.png"
         alt="logo"
         class="product-card__logo"
         v-else
