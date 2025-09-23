@@ -5,35 +5,15 @@
     <main class="content flex flex-column align-center mt-5">
       <h2 class="profile-title">내 프로필 변경하기</h2>
       <!-- 프로필 이미지 (클릭 시 파일 선택) -->
-      <div
-        class="profile-img clickable"
-        @click="triggerFilePicker"
-        title="프로필 사진 변경"
-        role="button"
-        tabindex="0"
-      >
+      <div class="profile-img clickable" @click="triggerFilePicker" title="프로필 사진 변경" role="button" tabindex="0">
         <template v-if="previewUrl || user?.profileImageUrl">
-          <img
-            :src="previewUrl || user.profileImageUrl"
-            alt="프로필 이미지"
-            class="profile-picture"
-          />
+          <img :src="previewUrl || user.profileImageUrl" alt="프로필 이미지" class="profile-picture" />
         </template>
         <template v-else>
-          <img
-            src="@/assets/user.png"
-            alt="기본 프로필 이미지"
-            class="profile-picture"
-          />
+          <img src="@/assets/user.png" alt="기본 프로필 이미지" class="profile-picture" />
         </template>
         <!-- 숨김 파일 입력 -->
-        <input
-          ref="fileInput"
-          type="file"
-          accept="image/*"
-          class="hidden-file"
-          @change="onFileChange"
-        />
+        <input ref="fileInput" type="file" accept="image/*" class="hidden-file" @change="onFileChange" />
         <div class="profile-img__hint" v-if="!uploading"></div>
         <div class="profile-img__hint" v-else></div>
       </div>
@@ -43,8 +23,7 @@
       <form
         v-if="!isChecking && !isVerified && !isSocialLogin"
         class="verify-card"
-        @submit.prevent="handleVerifyPassword"
-      >
+        @submit.prevent="handleVerifyPassword">
         <div class="verify-title">비밀번호 확인</div>
         <div class="verify-row">
           <label class="verify-label" for="verifyPw">현재 비밀번호</label>
@@ -55,8 +34,7 @@
             class="verify-input"
             placeholder="현재 비밀번호를 입력하세요"
             autocomplete="current-password"
-            required
-          />
+            required />
         </div>
         <p class="verify-error" v-if="verifyErr">{{ verifyErr }}</p>
         <div class="verify-actions">
@@ -66,26 +44,14 @@
       </form>
 
       <!-- 로딩 중 힌트 -->
-      <div v-if="isChecking" class="verify-card" style="text-align: center">
-        로딩 중...
-      </div>
+      <div v-if="isChecking" class="verify-card" style="text-align: center">로딩 중...</div>
 
       <!-- 프로필 카드 (비밀번호 확인 전에는 잠금 상태) -->
-      <div
-        class="profile-card"
-        :class="{ 'is-locked': !isChecking && !isVerified }"
-      >
+      <div class="profile-card" :class="{ 'is-locked': !isChecking && !isVerified }">
         <div class="profile-card__head">
           <h2 class="profile-title inner">내 정보 수정</h2>
-          <router-link
-            v-if="!isSocialLogin"
-            to="/myinfo/update/password"
-            class="pw-link"
-            >비밀번호 변경</router-link
-          >
-          <span v-else class="pw-link" style="opacity: 0.7; cursor: default"
-            >소셜 로그인 계정입니다</span
-          >
+          <router-link v-if="!isSocialLogin" to="/myinfo/update/password" class="pw-link">비밀번호 변경</router-link>
+          <span v-else class="pw-link" style="opacity: 0.7; cursor: default">소셜 로그인 계정입니다</span>
         </div>
 
         <!-- 폼 그리드 (가로 2열, 각 행당 입력 1개) -->
@@ -93,32 +59,21 @@
           <!-- 이메일 (읽기 전용) -->
           <div class="form-row">
             <label class="form-label">이메일</label>
-            <input
-              class="form-input"
-              type="email"
-              :value="user?.email || ''"
-              readonly
-            />
+            <input class="form-input" type="email" :value="user?.email || ''" readonly />
           </div>
 
           <!-- 비밀번호 (변경 진입용) -->
           <div class="form-row">
             <label class="form-label">비밀번호</label>
             <div class="pw-inline">
-              <input
-                class="form-input"
-                type="password"
-                value="********"
-                readonly
-              />
+              <input class="form-input" type="password" value="********" readonly />
               <router-link
                 v-if="!isSocialLogin"
                 :to="isVerified ? '/myinfo/update/password' : ''"
                 class="btn secondary tiny pw-change-btn"
                 :aria-disabled="!isVerified"
                 :tabindex="isVerified ? 0 : -1"
-                @click.prevent="handleGoChangePassword"
-              >
+                @click.prevent="handleGoChangePassword">
                 변경하러 가기
               </router-link>
               <span v-else class="pw-hint">소셜 로그인 계정입니다</span>
@@ -128,24 +83,13 @@
           <!-- 닉네임 -->
           <div class="form-row">
             <label class="form-label" for="nick">닉네임</label>
-            <input
-              id="nick"
-              class="form-input"
-              type="text"
-              v-model.trim="form.nickname"
-              :disabled="!isVerified"
-            />
+            <input id="nick" class="form-input" type="text" v-model.trim="form.nickname" :disabled="!isVerified" />
           </div>
 
           <!-- 성별 -->
           <div class="form-row">
             <label class="form-label" for="gender">성별</label>
-            <select
-              id="gender"
-              class="form-input"
-              v-model="form.gender"
-              :disabled="!isVerified"
-            >
+            <select id="gender" class="form-input" v-model="form.gender" :disabled="!isVerified">
               <option value="MALE">남성</option>
               <option value="FEMALE">여성</option>
               <option value="OTHER">기타</option>
@@ -155,71 +99,39 @@
           <!-- 생년월일 -->
           <div class="form-row">
             <label class="form-label" for="birth">생년월일</label>
-            <input
-              id="birth"
-              class="form-input"
-              type="date"
-              v-model="form.birthDate"
-              :disabled="!isVerified"
-            />
+            <input id="birth" class="form-input" type="date" v-model="form.birthDate" :disabled="!isVerified" />
           </div>
         </div>
 
         <!-- 액션 버튼 -->
         <div class="form-actions">
-          <button type="button" class="btn ghost" @click="handleLogout">
-            로그아웃
-          </button>
+          <button type="button" class="btn ghost" @click="handleLogout">로그아웃</button>
           <div class="spacer"></div>
-          <button type="button" class="btn danger" @click="handleDeleteAccount">
-            회원 탈퇴
-          </button>
-          <button
-            type="button"
-            class="btn primary"
-            @click="handleSaveProfile"
-            :disabled="!isVerified"
-          >
-            저장
-          </button>
+          <button type="button" class="btn danger" @click="handleDeleteAccount">회원 탈퇴</button>
+          <button type="button" class="btn primary" @click="handleSaveProfile" :disabled="!isVerified">저장</button>
         </div>
       </div>
       <!-- ===== 회원 탈퇴 확인 다이얼로그 ===== -->
-      <div
-        v-if="showDeleteDialog"
-        class="delete-overlay"
-        role="dialog"
-        aria-modal="true"
-      >
+      <div v-if="showDeleteDialog" class="delete-overlay" role="dialog" aria-modal="true">
         <div class="delete-modal">
           <div class="delete-modal__head">
             <h3 class="delete-title">정말로 회원 탈퇴하시나요?</h3>
-            <button
-              class="delete-close"
-              @click="closeDeleteDialog"
-              aria-label="닫기"
-            >
-              ✕
-            </button>
+            <button class="delete-close" @click="closeDeleteDialog" aria-label="닫기">✕</button>
           </div>
 
           <p class="delete-desc">
             탈퇴하시려면 아래 입력란에
             <strong>회원 탈퇴</strong>
-            를 정확히 입력하고, 탈퇴 사유를 선택해 주세요. 데이터는 복구되지
-            않습니다.
+            를 정확히 입력하고, 탈퇴 사유를 선택해 주세요. 데이터는 복구되지 않습니다.
           </p>
 
-          <label class="delete-label" for="deleteConfirmInput"
-            >확인 문구 입력</label
-          >
+          <label class="delete-label" for="deleteConfirmInput">확인 문구 입력</label>
           <input
             id="deleteConfirmInput"
             v-model.trim="confirmDeleteText"
             type="text"
             class="delete-input"
-            placeholder="회원 탈퇴"
-          />
+            placeholder="회원 탈퇴" />
 
           <label class="delete-label" for="deleteReason">탈퇴 사유</label>
           <select id="deleteReason" v-model="deleteReason" class="delete-input">
@@ -229,26 +141,20 @@
             </option>
           </select>
 
-          <div
-            v-if="deleteReason === '기타(직접 입력)'"
-            class="delete-detail-wrap"
-          >
+          <div v-if="deleteReason === '기타(직접 입력)'" class="delete-detail-wrap">
             <label class="delete-label" for="deleteDetail">상세 사유</label>
             <textarea
               id="deleteDetail"
               v-model.trim="deleteDetail"
               class="delete-textarea"
               rows="3"
-              placeholder="사유를 구체적으로 작성해 주세요"
-            ></textarea>
+              placeholder="사유를 구체적으로 작성해 주세요"></textarea>
           </div>
 
           <p v-if="deleteError" class="delete-error">{{ deleteError }}</p>
 
           <div class="delete-actions">
-            <button class="btn ghost" type="button" @click="closeDeleteDialog">
-              취소
-            </button>
+            <button class="btn ghost" type="button" @click="closeDeleteDialog">취소</button>
             <button
               class="btn danger"
               type="button"
@@ -258,14 +164,12 @@
                 !deleteReason ||
                 (deleteReason === '기타(직접 입력)' && !deleteDetail.trim())
               "
-              @click="submitDeleteAccount"
-            >
+              @click="submitDeleteAccount">
               {{ isDeleting ? '처리 중...' : '탈퇴하기' }}
             </button>
           </div>
         </div>
       </div>
-
     </main>
   </div>
 </template>
@@ -284,7 +188,6 @@ const deleteDetail = ref('');
 const confirmDeleteText = ref('');
 const isDeleting = ref(false);
 const deleteError = ref('');
-
 
 const DELETE_REASONS = [
   '서비스가 마음에 들지 않음',
@@ -365,10 +268,7 @@ async function onFileChange(e) {
   const inferredByExt = extToMime(extFromName);
   const rawType = (file.type || '').trim();
   // 최종 Content-Type: 파일이 제공하면 우선, 아니면 확장자, 그래도 없으면 png
-  const contentType =
-    rawType && rawType.startsWith('image/')
-      ? rawType
-      : inferredByExt || 'image/png';
+  const contentType = rawType && rawType.startsWith('image/') ? rawType : inferredByExt || 'image/png';
 
   const safeName = hasExt ? origName : `profile_${Date.now()}.png`;
 
@@ -477,15 +377,18 @@ async function submitDeleteAccount() {
   const typedOk = confirmDeleteText.value.trim() === '회원 탈퇴';
   const reasonOk = !!deleteReason.value;
   const needDetail = deleteReason.value === '기타(직접 입력)';
-  const detailOk =
-    !needDetail || (needDetail && deleteDetail.value.trim().length > 0);
+  const detailOk = !needDetail || (needDetail && deleteDetail.value.trim().length > 0);
 
   if (!typedOk || !reasonOk || !detailOk) {
     deleteError.value = '상단 안내 문구와 사유 선택/입력을 완료해 주세요.';
     return;
   }
 
-  const confirmed = await showDangerConfirm('정말로 회원 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.', '회원 탈퇴 확인', '탈퇴');
+  const confirmed = await showDangerConfirm(
+    '정말로 회원 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+    '회원 탈퇴 확인',
+    '탈퇴'
+  );
   if (!confirmed) return;
 
   isDeleting.value = true;
@@ -501,9 +404,7 @@ async function submitDeleteAccount() {
     window.location.href = '/';
   } catch (err) {
     console.error('[delete account] error', err);
-    deleteError.value =
-      err?.response?.data?.message ||
-      '탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+    deleteError.value = err?.response?.data?.message || '탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
   } finally {
     isDeleting.value = false;
   }
@@ -537,8 +438,7 @@ async function handleVerifyPassword() {
     }
   } catch (err) {
     console.error('[verify] error', err?.response?.status, err?.response?.data);
-    verifyErr.value =
-      err?.response?.data?.message || '비밀번호 검증 중 오류가 발생했습니다.';
+    verifyErr.value = err?.response?.data?.message || '비밀번호 검증 중 오류가 발생했습니다.';
   } finally {
     isChecking.value = false; // 로딩 off
   }
@@ -572,27 +472,11 @@ onMounted(async () => {
 
     // 소셜 로그인 여부 판단 (여러 백엔드 필드 대응)
     const r = res.result || {};
-    const provider = (
-      r.provider ||
-      r.authProvider ||
-      r.loginType ||
-      r.socialProvider ||
-      ''
-    )
-      .toString()
-      .toUpperCase();
-    const isProviderSocial = [
-      'KAKAO',
-      'NAVER',
-      'GOOGLE',
-      'APPLE',
-      'FACEBOOK',
-      'GITHUB',
-      'SOCIAL',
-      'OAUTH',
-    ].includes(provider);
-    const hasPassword =
-      r.hasPassword !== undefined ? !!r.hasPassword : undefined;
+    const provider = (r.provider || r.authProvider || r.loginType || r.socialProvider || '').toString().toUpperCase();
+    const isProviderSocial = ['KAKAO', 'NAVER', 'GOOGLE', 'APPLE', 'FACEBOOK', 'GITHUB', 'SOCIAL', 'OAUTH'].includes(
+      provider
+    );
+    const hasPassword = r.hasPassword !== undefined ? !!r.hasPassword : undefined;
 
     // 1차: 백엔드 응답 기반 판단
     let socialByResponse =
@@ -603,21 +487,10 @@ onMounted(async () => {
       hasPassword === false;
 
     // 2차: 로그인 스토어 기반 보조 판단 (로그인 시 저장해둔 값 활용)
-    const storeProvider = (authStore?.provider || authStore?.loginType || '')
-      .toString()
-      .toUpperCase();
+    const storeProvider = (authStore?.provider || authStore?.loginType || '').toString().toUpperCase();
     const storeIsSocial =
       authStore?.isSocialLogin === true ||
-      [
-        'KAKAO',
-        'NAVER',
-        'GOOGLE',
-        'APPLE',
-        'FACEBOOK',
-        'GITHUB',
-        'SOCIAL',
-        'OAUTH',
-      ].includes(storeProvider);
+      ['KAKAO', 'NAVER', 'GOOGLE', 'APPLE', 'FACEBOOK', 'GITHUB', 'SOCIAL', 'OAUTH'].includes(storeProvider);
 
     isSocialLogin.value = socialByResponse || storeIsSocial;
 
@@ -1097,17 +970,17 @@ a.info-item {
     width: calc(100vw - 40px);
     padding: 20px;
   }
-  
+
   .modal-actions {
     flex-direction: column-reverse;
     gap: 8px;
   }
-  
+
   .modal-actions .btn {
     width: 100%;
     min-width: unset;
   }
-  
+
   .modal-message {
     font-size: 15px;
   }

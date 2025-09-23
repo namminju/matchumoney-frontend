@@ -5,55 +5,40 @@
       <div class="hero-inner">
         <div class="orb" aria-hidden="true"></div>
         <h1 class="title">
-          <i class="fa-solid fa-coins" aria-hidden="true"></i> 오늘의 금전운
+          <i class="fa-solid fa-coins" aria-hidden="true"></i>
+          오늘의 금전운
         </h1>
         <p class="subtitle">
-          생년월일·태어난 시간·성별을 입력하면 맞추머니가 오늘의 금전 흐름을
-          가볍고 즐겁게 알려줘요.
+          생년월일·태어난 시간·성별을 입력하면 맞추머니가 오늘의 금전 흐름을 가볍고 즐겁게 알려줘요.
         </p>
       </div>
     </div>
 
     <div class="content">
       <!-- 1) 입력 카드 -->
-      <form
-        class="card form-card equal-card"
-        @submit.prevent="handleSubmit"
-        novalidate
-      >
+      <form class="card form-card equal-card" @submit.prevent="handleSubmit" novalidate>
         <div class="grid">
           <div class="field">
             <label for="name">이름 (선택)</label>
-            <input
-              id="name"
-              v-model.trim="form.name"
-              type="text"
-              placeholder="이름을 입력하세요"
-            />
+            <input id="name" v-model.trim="form.name" type="text" placeholder="이름을 입력하세요" />
           </div>
 
           <div class="field">
-            <label for="birthDate">생년월일 <span class="req">*</span></label>
-            <input
-              id="birthDate"
-              v-model="form.birthDate"
-              type="date"
-              required
-            />
-            <p v-if="touched.birthDate && !form.birthDate" class="error">
-              생년월일을 입력해 주세요.
-            </p>
+            <label for="birthDate">
+              생년월일
+              <span class="req">*</span>
+            </label>
+            <input id="birthDate" v-model="form.birthDate" type="date" required />
+            <p v-if="touched.birthDate && !form.birthDate" class="error">생년월일을 입력해 주세요.</p>
           </div>
 
           <div class="field">
-            <label for="birthTime">태어난 시간 <small>(선택)</small></label>
+            <label for="birthTime">
+              태어난 시간
+              <small>(선택)</small>
+            </label>
             <div class="time-row">
-              <input
-                id="birthTime"
-                v-model="form.birthTime"
-                type="time"
-                :disabled="form.timeUnknown"
-              />
+              <input id="birthTime" v-model="form.birthTime" type="time" :disabled="form.timeUnknown" />
               <label class="chk">
                 <input type="checkbox" v-model="form.timeUnknown" />
                 시간을 모르겠어요
@@ -62,45 +47,29 @@
           </div>
 
           <div class="field gender">
-            <span class="label">성별 <span class="req">*</span></span>
+            <span class="label">
+              성별
+              <span class="req">*</span>
+            </span>
             <div class="segmented">
               <label :class="['seg', form.gender === 'MALE' && 'active']">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="MALE"
-                  v-model="form.gender"
-                />남성
+                <input type="radio" name="gender" value="MALE" v-model="form.gender" />
+                남성
               </label>
               <label :class="['seg', form.gender === 'FEMALE' && 'active']">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="FEMALE"
-                  v-model="form.gender"
-                />여성
+                <input type="radio" name="gender" value="FEMALE" v-model="form.gender" />
+                여성
               </label>
             </div>
-            <p v-if="touched.gender && !form.gender" class="error">
-              성별을 선택해 주세요.
-            </p>
+            <p v-if="touched.gender && !form.gender" class="error">성별을 선택해 주세요.</p>
           </div>
         </div>
         <div class="actions">
-          <button
-            class="btn primary"
-            type="submit"
-            :disabled="loadingReport || loadingTasks"
-          >
+          <button class="btn primary" type="submit" :disabled="loadingReport || loadingTasks">
             <span v-if="!loadingReport && !loadingTasks">금전운 보기</span>
             <span v-else class="spinner small"></span>
           </button>
-          <button
-            class="btn ghost"
-            type="button"
-            @click="resetForm"
-            :disabled="loadingReport || loadingTasks"
-          >
+          <button class="btn ghost" type="button" @click="resetForm" :disabled="loadingReport || loadingTasks">
             초기화
           </button>
         </div>
@@ -114,11 +83,7 @@
       <!-- 2) 금전운 리포트 카드 -->
       <div class="card result-card equal-card" v-if="step >= 2">
         <div class="result-header">
-          <img
-            class="bot-avatar"
-            src="@/assets/chatbot_images/chatbot_cat.png"
-            alt="맞추머니"
-          />
+          <img class="bot-avatar" src="@/assets/chatbot_images/chatbot_cat.png" alt="맞추머니" />
           <div class="meta">
             <div class="name">맞추머니 챗봇</div>
             <div class="desc">금전운 리포트</div>
@@ -132,9 +97,7 @@
           <div v-else class="bubble" v-html="formatted(resultText)"></div>
         </div>
         <div class="result-actions" v-if="!loadingReport && resultText">
-          <button class="btn secondary tiny" @click="copyToClipboard">
-            복사하기
-          </button>
+          <button class="btn secondary tiny" @click="copyToClipboard">복사하기</button>
           <button class="btn tiny" @click="seeAgain">다시 보기</button>
         </div>
       </div>
@@ -148,8 +111,8 @@
       <div class="card todo-card equal-card" v-if="step >= 3">
         <div class="todo-header">
           <div class="todo-title">
-            <i class="fa-solid fa-list-check" aria-hidden="true"></i> 오늘 하면
-            좋은 일 3가지
+            <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+            오늘 하면 좋은 일 3가지
           </div>
           <div class="todo-sub">금전운을 바탕으로 한 실천 가이드</div>
         </div>
@@ -183,8 +146,7 @@ onMounted(() => {
     const link = document.createElement('link');
     link.id = id;
     link.rel = 'stylesheet';
-    link.href =
-      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
     link.crossOrigin = 'anonymous';
     link.referrerPolicy = 'no-referrer';
     document.head.appendChild(link);
@@ -266,8 +228,7 @@ const handleSubmit = async () => {
     );
     const raw = (res?.data?.reply || '').trim();
     const { report, actions } = extractSections(raw);
-    resultText.value =
-      report || '운세를 가져오지 못했어요. 잠시 후 다시 시도해 주세요.';
+    resultText.value = report || '운세를 가져오지 못했어요. 잠시 후 다시 시도해 주세요.';
 
     // 2) 리포트 완료 → 투두
     loadingReport.value = false;
@@ -312,9 +273,7 @@ const extractSections = (text) => {
   // Fallbacks when markers are missing
   if (!out.report) {
     // Drop common greetings / salutations on the first lines
-    t = t
-      .replace(/^안녕하세요[^\n]*\n+/gi, '')
-      .replace(/^.*?님[^\n]*\n+/gi, '');
+    t = t.replace(/^안녕하세요[^\n]*\n+/gi, '').replace(/^.*?님[^\n]*\n+/gi, '');
 
     // Use the first meaningful paragraph (not too short and not a greeting)
     const paras = t
@@ -322,10 +281,7 @@ const extractSections = (text) => {
       .map((p) => p.trim())
       .filter(Boolean);
     const firstIdx = paras.findIndex(
-      (p) =>
-        p.length > 30 &&
-        !/^안녕하세요/i.test(p) &&
-        !/안내해\s*드리겠습니다|안내해드리겠습니다/.test(p)
+      (p) => p.length > 30 && !/^안녕하세요/i.test(p) && !/안내해\s*드리겠습니다|안내해드리겠습니다/.test(p)
     );
     const chosen = firstIdx >= 0 ? paras[firstIdx] : paras[0] || t;
     out.report = chosen.trim();
@@ -341,11 +297,7 @@ const extractSections = (text) => {
     out.actions =
       candidates.length >= 3
         ? candidates.slice(0, 3)
-        : [
-            '지출 계획 점검하기',
-            '중요 거래는 문서 재확인하기',
-            '불필요한 소비 줄이고 예산 기록하기',
-          ];
+        : ['지출 계획 점검하기', '중요 거래는 문서 재확인하기', '불필요한 소비 줄이고 예산 기록하기'];
   }
   return out;
 };
@@ -374,17 +326,8 @@ const seeAgain = () => {
 /* 레이아웃 */
 .fortune-page {
   min-height: 100%;
-  background: radial-gradient(
-      1200px 600px at 80% -10%,
-      rgba(175, 199, 255, 0.25),
-      transparent 60%
-    ),
-    radial-gradient(
-      1000px 500px at -10% 10%,
-      rgba(255, 204, 229, 0.25),
-      transparent 55%
-    ),
-    var(--bg-body, #f7f9fc);
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(175, 199, 255, 0.25), transparent 60%),
+    radial-gradient(1000px 500px at -10% 10%, rgba(255, 204, 229, 0.25), transparent 55%), var(--bg-body, #f7f9fc);
   color: var(--text-primary, #111827);
 }
 

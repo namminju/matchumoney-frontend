@@ -11,10 +11,12 @@ let initStarted = false; // 초기화 시도 중 (진행 중 재호출 방지)
 let initDone = false; // 초기화 완료 (완료 후 재호출 방지)
 let onMessageBound = false; // onMessage 핸들러 중복 바인딩 방지
 let cachedMessaging = null; // 필요 시 재사용
+let onMessageUnsubscribe = null; // onMessage 해제 함수 (HMR/중복 대비)
+const __GLOBAL_ONMESSAGE_KEY__ = '__FCM_ONMESSAGE_BOUND__';
 
 // --- in-memory de-duplication for foreground toasts ---
 const __recentMsgs = new Map(); // key -> timestamp
-const __DEDUP_TTL_MS = 60 * 1000; // keep keys for 60s
+const __DEDUP_TTL_MS = 15 * 1000; // keep keys for 15s (short cooldown)
 const __DEDUP_MAX = 200; // avoid unbounded growth
 
 function __cleanupDedupMap(now = Date.now()) {
@@ -41,8 +43,55 @@ function __seenBefore(key) {
   return false;
 }
 
+function __markSeen(key) {
+  if (!key) return;
+  const now = Date.now();
+  __cleanupDedupMap(now);
+  __recentMsgs.set(key, now);
+}
+
+// --- canonical signature for foreground de-duplication ---
+function __canonicalSig(payload) {
+  const d = payload?.data || {};
+  const n = payload?.notification || {};
+
+  const type = (d.type || '').trim();
+  const title = (n.title || d.title || '').trim();
+  const body = (n.body || d.body || '').trim();
+
+  // link 기본값 '/' 처리 후 표준화
+  let link = d.link || n.click_action || '/';
+  try {
+    // URL 인스턴스로 프로토콜/호스트는 제거하고 path+query+hash만 사용
+    const u = new URL(link, location.origin);
+    link = (u.pathname + u.search + u.hash).replace(/\/+$/, '') || '/';
+  } catch {
+    // 상대경로/임의 문자열인 경우 최소 정규화
+    link = link.replace(/^https?:\/\//, '').replace(/\/+$/, '') || '/';
+  }
+
+  return `${type}|${title}|${body}|${link}`;
+}
+
+function __looseSig(payload) {
+  const d = payload?.data || {};
+  const n = payload?.notification || {};
+
+  const type = (d.type || '').trim();
+  const title = (n.title || d.title || '').trim();
+  const body = (n.body || d.body || '').trim();
+
+  // ⬇️ 링크는 제외하여 동일 타이틀/본문을 단시간 중복으로 간주
+  return `${type}|${title}|${body}`;
+}
+
 // --- helper: 포그라운드 핸들러 바인딩(단 1회) ---
 function bindOnMessageOnce(messaging) {
+  // 1) 브라우저 전역(HMR 포함) 중복 바인딩 차단
+  if (typeof window !== 'undefined' && window[__GLOBAL_ONMESSAGE_KEY__]) {
+    console.log('[FCM] onMessage already bound (global) — skip');
+    return;
+  }
   if (onMessageBound) {
     console.log('[FCM] onMessage already bound — skip');
     return;
@@ -51,37 +100,75 @@ function bindOnMessageOnce(messaging) {
     console.warn('[FCM] bindOnMessageOnce called without messaging instance');
     return;
   }
+
+  // 2) 기존 바인딩이 있다면 우선 해제 (HMR/중복 대비)
+  if (typeof onMessageUnsubscribe === 'function') {
+    try {
+      onMessageUnsubscribe();
+      console.log('[FCM] previous onMessage listener unsubscribed');
+    } catch (_) {}
+    onMessageUnsubscribe = null;
+  }
+
   console.log('[FCM] binding onMessage');
-  onMessage(messaging, (payload) => {
+  onMessageUnsubscribe = onMessage(messaging, (payload) => {
     // Foreground only: avoid double UI when tab hidden and SW shows a system notification
     if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
       return;
     }
 
-    // De-duplication: use messageId -> traceId -> stable data signature
     const d = payload?.data || {};
     const n = payload?.notification;
-    const dedupKey = payload?.messageId || d.traceId || d.type + '|' + d.title + '|' + d.body + '|' + d.link;
-    if (__seenBefore(dedupKey)) {
-      console.log('[FCM] duplicate foreground message ignored:', dedupKey);
+
+    // 먼저 표시할 텍스트들을 계산
+    const title = (n?.title || d.title || '알림').trim();
+    const body = (n?.body || d.body || '').trim();
+    const link = d.link || n?.click_action || '/';
+
+    const looseKey = __looseSig(payload);
+
+    const canonKey = __canonicalSig(payload);
+    if (__seenBefore(canonKey)) {
+      console.log('[FCM] duplicate (canonical) ignored:', canonKey);
+      return;
+    }
+    // 🔁 body 유무/공백 차이만 있을 때도 중복으로 간주
+    if (__seenBefore(looseKey)) {
+      console.log('[FCM] duplicate (loose) ignored:', looseKey);
+      return;
+    }
+
+    // 2순위: traceId가 있으면 추가적으로 중복 방지 키로 기록
+    if (d.traceId && __seenBefore(d.traceId)) {
+      console.log('[FCM] duplicate (by traceId) ignored:', d.traceId);
+      return;
+    }
+
+    // 3순위: messageId가 있으면 추가적으로 중복 방지 키로 기록
+    if (payload?.messageId && __seenBefore(payload.messageId)) {
+      console.log('[FCM] duplicate (by messageId) ignored:', payload.messageId);
       return;
     }
 
     console.log('[FCM] 포그라운드 메시지 수신:', payload);
-    const title = n?.title || d.title || '알림';
-    const body = n?.body || d.body || '';
-    const link = d.link || n?.click_action || '/';
+
+    __markSeen(canonKey);
+    __markSeen(looseKey);
 
     showToast({
       title,
       message: body,
-      type: 'info',
+      type: 'success',
       onClick: () => {
         if (link) window.open(link, '_blank');
       },
     });
   });
+
   onMessageBound = true;
+  if (typeof window !== 'undefined') {
+    window[__GLOBAL_ONMESSAGE_KEY__] = true;
+  }
 }
 
 export async function initFCM() {

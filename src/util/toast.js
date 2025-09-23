@@ -39,6 +39,16 @@ export function showToast({ title = '', message = '', type = 'info', delay = 500
   // Style the close button with accent color tone
   const closeBtn = toastEl.querySelector('.btn-close');
   closeBtn.style.filter = 'invert(50%) sepia(90%) saturate(300%) hue-rotate(75deg)';
+  closeBtn.style.width = '1.5rem';
+  closeBtn.style.height = '1.5rem';
+  closeBtn.style.fontSize = '1.25rem';
+  closeBtn.style.padding = '0.75rem';
+  closeBtn.style.minWidth = '2.5rem';
+  closeBtn.style.minHeight = '2.5rem';
+
+  const bodyEl = toastEl.querySelector('.toast-body');
+  bodyEl.style.fontSize = '1.1rem';
+  bodyEl.style.lineHeight = '1.4';
 
   container.appendChild(toastEl);
 
@@ -54,5 +64,5 @@ export function showToast({ title = '', message = '', type = 'info', delay = 500
 
 // dev quick test
 window.testToast = () => {
-  showToast({ title: '테스트', message: '토스트 정상 출력 👍', type: 'info' });
+  showToast({ title: '테스트', message: '토스트 정상 출력 👍', type: 'success' });
 };
